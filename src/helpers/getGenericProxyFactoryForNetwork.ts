@@ -1,42 +1,27 @@
 import { readFileSync } from "fs";
 
-const lookupPathBase  = `./node_modules/@pooltogether/pooltogether-proxy-factory/deployments/`
-const jsonFileName = `GenericProxyFactory.json`
-
 export function getGenericProxyFactoryAddressForChainId(chainId: number) : any {
-    let lookupPathForNetwork
     switch (chainId) {
         case 1:
-          lookupPathForNetwork =  lookupPathBase+"mainnet"+jsonFileName;
-        case 3:
-          lookupPathForNetwork =  lookupPathBase+'ropsten'+jsonFileName;
+          return "0x14e09c3319244a84e7c1E7B52634f5220FA96623"
         case 4:
-          lookupPathForNetwork =  lookupPathBase+'rinkeby'+jsonFileName;
-        case 5:
-          lookupPathForNetwork =  lookupPathBase+'goerli'+jsonFileName;
+          return "0x594069c560D260F90C21Be25fD2C8684efbb5628"
         case 42:
-          lookupPathForNetwork =  lookupPathBase+'kovan'+jsonFileName;
+          return  "0x713edC7728C4F0BCc135D48fF96282444d77E604"
         case 77:
-          lookupPathForNetwork =  lookupPathBase+'sokol'+jsonFileName;
+          //lookupPathForNetwork =  lookupPathBase+'sokol'+jsonFileName;
+          return ""
         case 99:
-          lookupPathForNetwork =  lookupPathBase+'poa'+jsonFileName;
+          //lookupPathForNetwork =  lookupPathBase+'poa'+jsonFileName;
+          return ""
         case 100:
-          lookupPathForNetwork =  lookupPathBase+'xdai'+jsonFileName;
+          //lookupPathForNetwork =  lookupPathBase+'xdai'+jsonFileName;
+          return ""
         case 137:
-          lookupPathForNetwork =  lookupPathBase+'matic'+jsonFileName;
-        case 31337:
-          lookupPathForNetwork =  lookupPathBase+'HardhatEVM'+jsonFileName;
+          return "0xd1797D46C3E825fce5215a0259D3426a5c49455C"
         case 80001:
-          lookupPathForNetwork =  lookupPathBase+'mumbai'+jsonFileName;
+          return "0xd1797D46C3E825fce5215a0259D3426a5c49455C"
             
           //throw new Error(`No GenericProxyFactory deployment file found for chainId ${chainId}`)
     }
-    console.log(`searching for ${lookupPathForNetwork}`)
-    return readDeploymentFile(lookupPathForNetwork)
 };
-
-
-
-function readDeploymentFile(path: any){
-    return (JSON.parse(readFileSync(path, { encoding: "utf-8"}))).address
-}
