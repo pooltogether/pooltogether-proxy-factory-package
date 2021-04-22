@@ -1,4 +1,3 @@
-import { lookup } from "dns";
 import { readFileSync } from "fs";
 
 const lookupPathBase  = `./node_modules/@pooltogether/pooltogether-proxy-factory/deployments/`

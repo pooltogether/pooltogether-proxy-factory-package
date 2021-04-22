@@ -1,7 +1,7 @@
 {
-  "name": "@pooltogether/proxy-factory-package",
-  "version": "1.0.0",
-  "description": "Versions of the PoolTogether contracts",
+  "name": "@pooltogether/pooltogether-proxy-factory-package",
+  "version": "1.0.0.beta.1",
+  "description": "Typescript package to use the GenericProxyFactory",
   "main": "dist/index.js",
   "repository": "github.com:pooltogether/pooltogether-versioning",
   "license": "MIT",
