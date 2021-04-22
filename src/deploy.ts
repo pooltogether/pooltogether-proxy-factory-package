@@ -61,6 +61,8 @@ export async function factoryDeploy(deploySettings: DeploySettings){
     //get network name
     const networkName = await provider.getNetwork()
 
+    // if is localhost we will need to deploy a local proxy factory instance?
+
     // get address of minimal proxy factory
     const genericProxyFactoryAddress = getGenericProxyFactoryAddressForChainId((await provider.getNetwork()).chainId)
 
