@@ -1,6 +1,6 @@
 {
   "name": "@pooltogether/pooltogether-proxy-factory-package",
-  "version": "1.0.0-beta.3",
+  "version": "1.0.0-beta.4",
   "description": "Typescript package to use the GenericProxyFactory",
   "main": "dist/index.js",
   "repository": "github.com:pooltogether/pooltogether-proxy-factory-package",
@@ -8,7 +8,8 @@
   "scripts": {},
   "dependencies": {},
   "files": [
-    "dist/*"
+    "dist/*",
+    "abis/"
   ],
   "devDependencies": {
     "@pooltogether/pooltogether-proxy-factory": "^1.0.0-beta.3",
