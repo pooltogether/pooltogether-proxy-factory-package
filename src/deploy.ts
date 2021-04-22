@@ -2,7 +2,7 @@
 import chalk from 'chalk';
 import { existsSync, writeFileSync } from 'fs';
 
-import GenericProxyFactory from "@pooltogether/pooltogether-proxy-factory/abis/GenericProxyFactory.json"
+import GenericProxyFactory from "../abis/GenericProxyFactory.json"
 
 import {getGenericProxyFactoryAddressForChainId} from "./helpers/getGenericProxyFactoryForNetwork"
 import { ethers } from "ethers"
