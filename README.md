@@ -12,7 +12,7 @@ Import in the deployments script:
 import { factoryDeploy } from "@pooltogether-proxy-factory-package"
 ```
 Pass the paramaters required:
-```javascript
+```typescript
 interface DeploySettings {
     implementationAddress: string
     contractName: string
