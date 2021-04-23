@@ -37,3 +37,10 @@ Run the unit tests locally with:
 ## Coverage
 Generate the test coverage report with:
 `yarn coverage`
+
+Todo:
+- use peerDependency for pooltgoether-proxy-factory
+- Write script that extracts deployed generic proxy factory addresses automatically
+- update tpes for DeploySettings interface
+- do we need both the signer and the provider
+- prublish non beta version
