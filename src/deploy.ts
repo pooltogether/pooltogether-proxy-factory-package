@@ -49,42 +49,67 @@ interface DeploySettings {
     overWrite?: boolean
     signer?: any // replace with Signer type from ethers -- do we definitely need this? get from the provider?
     initializeData?: any // string?
-    abi: any, // only if intialize is to be called
     provider: any // Provider type?
 }
 
 export async function factoryDeploy(deploySettings: DeploySettings){
-    const provider = new ethers.providers.JsonRpcBatchProvider(deploySettings.provider)
 
-    console.log("provider is ", provider)
+    const provider = deploySettings.provider
+    const networkName = (await provider.getNetwork()).name
 
-    //get network name
-    const networkName = await provider.getNetwork()
+    let initializeData
+    if(!deploySettings.initializeData){
+      initializeData = "0x"
+    }
+    else {
+      initializeData = deploySettings.initializeData
+    }
 
-    // if is localhost we will need to deploy a local proxy factory instance?
+    let overWrite
+    if(deploySettings.overWrite === undefined){
+      overWrite = false
+    }
+    else{
+      overWrite = true
+    }
+    if(overWrite && existsSync(`./deployments/${networkName}/${deploySettings.contractName}.json`)){
+      cyan(`Using existing implementation for ${deploySettings.contractName}`)
+      return
+    }
 
-    // get address of minimal proxy factory
-    const genericProxyFactoryAddress = getGenericProxyFactoryAddressForChainId((await provider.getNetwork()).chainId)
+  
+        // get address of minimal proxy factory
+    const chainId = (await provider.getNetwork()).chainId
+    
+    dim(`factoryDeploy for chainId ${chainId}`)
 
+    let genericProxyFactoryAddress: string = ""
+    if(chainId === 31337 || chainId === 1337){  // if is localhost we will need to deploy a local proxy factory instance
+      dim(`Test network detected.. deploying GenericPorxyFactory`)
+      const genericProxyFactoryInterface = new ethers.utils.Interface(GenericProxyFactory.abi)
+      const genericProxyFactoryContractFactory = new ethers.ContractFactory(genericProxyFactoryInterface, GenericProxyFactory.bytecode, deploySettings.signer)
+      const genericProxyFacoryContract = await genericProxyFactoryContractFactory.deploy()
+      await genericProxyFacoryContract.deployTransaction.wait()
+      genericProxyFactoryAddress = genericProxyFacoryContract.address
+
+    }
+    else{
+      genericProxyFactoryAddress = getGenericProxyFactoryAddressForChainId(chainId)
+    }
+
+  
     if(!genericProxyFactoryAddress){
         throw new Error(`No GenericProxyFactory deployed for this network ()`)
-    }
-    if(deploySettings.initializeData && !deploySettings.abi){
-        throw new Error(`Initialize data provided but no ABI`)
-    }
-
-    if(deploySettings.overWrite && existsSync(`./deployments/${networkName}/${deploySettings.contractName}.json`)){
-        cyan(`Using existing implementation for ${deploySettings.contractName}`)
-        return
     }
 
     cyan(`GenericProxyFactory for network ${networkName} at address ${genericProxyFactoryAddress}`)
 
-    // grab abi and create contract instance
-    const genericProxyFactoryContract = new ethers.Contract(genericProxyFactoryAddress, GenericProxyFactory, deploySettings.signer)
+    // grab abi and connect to contract instance
+    const genericProxyFactoryContract = new ethers.Contract(genericProxyFactoryAddress, GenericProxyFactory.abi, deploySettings.signer)
+    dim(`Creating Proxy...`)
+    const createProxyResult = await genericProxyFactoryContract.create(deploySettings.implementationAddress, initializeData)
 
-    const createProxyResult = await genericProxyFactoryContract.create(deploySettings.implementationAddress, deploySettings.initializeData)
-
+    dim(`Awaiting transaction confirmation...`)
     await provider.waitForTransaction(createProxyResult.hash)
 
     const receipt = await provider.getTransactionReceipt(createProxyResult.hash);
@@ -100,14 +125,7 @@ export async function factoryDeploy(deploySettings: DeploySettings){
         bytecode: `${await provider.getCode(createdEvent.args.created)}`
     }
     const pathFile = `./deployments/${networkName}/${deploySettings.contractName}.json`
-    dim(`Deployments file saved at ${pathFile}`)
+
     writeFileSync(pathFile, JSON.stringify(jsonObj), {encoding:'utf8',flag:'w'})
-
-    // now call intializer if applicable
-    if(deploySettings.initializeData){
-        dim(`calling passed function`)
-        const instanceContract = new ethers.Contract(createdEvent.args.created, deploySettings.abi, deploySettings.signer)
-        await instanceContract.initialize(deploySettings.initializeData) // will this always be intialize? 
-    }
-
+    dim(`Deployments file saved at ${pathFile}`)
 }
