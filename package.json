@@ -1,6 +1,6 @@
 {
   "name": "@pooltogether/pooltogether-proxy-factory-package",
-  "version": "1.0.0-beta.13",
+  "version": "1.0.0-beta.14",
   "description": "Typescript package to use the GenericProxyFactory",
   "main": "dist/src/index.js",
   "repository": "github.com:pooltogether/pooltogether-proxy-factory-package",
