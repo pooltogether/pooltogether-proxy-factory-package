@@ -5,12 +5,19 @@ Typescript wrapper to use PoolTogether's Generic Minimal Proxy Factory for deplo
 ## How it works
 
 Import this package into your repo using:
-`yarn add -D @pooltogether-proxy-factory-package`
+`yarn add -D @pooltogether/pooltogether-proxy-factory-package`
+
 
 Import in the deployments script:
-```javascript
-import { factoryDeploy } from "@pooltogether-proxy-factory-package"
+```typescript
+import { factoryDeploy } from "@pooltogether/pooltogether-proxy-factory-package"
 ```
+or
+```javascript
+const { factoryDeploy } = require("@pooltogether/pooltogether-proxy-factory-package")
+```
+
+
 Pass the paramaters required:
 ```typescript
 interface DeploySettings {
