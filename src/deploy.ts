@@ -1,6 +1,6 @@
 // exports a generic factoryDeploy using the generic minimal proxy factories
 import chalk from 'chalk';
-import { existsSync, writeFileSync } from 'fs';
+import { existsSync, mkdirSync, writeFileSync } from 'fs';
 
 import GenericProxyFactory from "../abis/GenericProxyFactory.json"
 
@@ -55,7 +55,7 @@ interface DeploySettings {
 export async function factoryDeploy(deploySettings: DeploySettings){
 
     const provider = deploySettings.provider
-    const networkName = (await provider.getNetwork()).name
+    let networkName = (await provider.getNetwork()).name
 
     let initializeData
     if(!deploySettings.initializeData){
@@ -92,6 +92,8 @@ export async function factoryDeploy(deploySettings: DeploySettings){
       await genericProxyFacoryContract.deployTransaction.wait()
       genericProxyFactoryAddress = genericProxyFacoryContract.address
 
+      networkName = "localhost"
+
     }
     else{
       genericProxyFactoryAddress = getGenericProxyFactoryAddressForChainId(chainId)
@@ -124,7 +126,10 @@ export async function factoryDeploy(deploySettings: DeploySettings){
         args: deploySettings?.initializeData,
         bytecode: `${await provider.getCode(createdEvent.args.created)}`
     }
-    const pathFile = `./deployments/${networkName}/${deploySettings.contractName}.json`
+    const pathFileBase = `./deployments/${networkName}`
+    const pathFile = `${pathFileBase}/${deploySettings.contractName}.json`
+
+    mkdirSync(pathFileBase, { recursive: true });
 
     writeFileSync(pathFile, JSON.stringify(jsonObj), {encoding:'utf8',flag:'w'})
     dim(`Deployments file saved at ${pathFile}`)
