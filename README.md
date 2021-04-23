@@ -11,6 +11,18 @@ Import in the deployments script:
 ```javascript
 import { factoryDeploy } from "@pooltogether-proxy-factory-package"
 ```
+Pass the paramaters required:
+```javascript
+interface DeploySettings {
+    implementationAddress: string
+    contractName: string
+    overWrite?: boolean
+    signer?: any 
+    initializeData?: any
+    provider: any 
+}
+```
+
 
 
 # Installation
