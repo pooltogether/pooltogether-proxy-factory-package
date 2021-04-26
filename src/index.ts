@@ -1,5 +1,8 @@
-import {factoryDeploy} from "./deploy"
+import {factoryDeploy, DeploySettings } from "./deploy"
+
+
 
 module.exports = {
     factoryDeploy
+
 }

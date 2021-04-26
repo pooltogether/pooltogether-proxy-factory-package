@@ -5,7 +5,9 @@ import { existsSync, mkdirSync, writeFileSync } from 'fs';
 import GenericProxyFactory from "../abis/GenericProxyFactory.json"
 
 import {getGenericProxyFactoryAddressForChainId} from "./helpers/getGenericProxyFactoryForNetwork"
-import { ethers } from "ethers"
+import { ethers, Signer, providers } from "ethers"
+
+
 
 const displayLogs = !process.env.HIDE_DEPLOY_LOG;
 
@@ -43,13 +45,13 @@ interface ProxyDeployment {
     bytecode?: string
 }
 
-interface DeploySettings {
+export interface DeploySettings {
     implementationAddress: string
     contractName: string
-    overWrite?: boolean
-    signer?: any // replace with Signer type from ethers -- do we definitely need this? get from the provider?
-    initializeData?: any // string?
-    provider: any // Provider type?
+    skipIfAlreadyDeployed?: boolean // defaults to false
+    signer?: Signer // do we definitely need this? get from the provider?
+    initializeData?: string
+    provider: providers.Provider 
 }
 
 export async function factoryDeploy(deploySettings: DeploySettings){
@@ -65,14 +67,14 @@ export async function factoryDeploy(deploySettings: DeploySettings){
       initializeData = deploySettings.initializeData
     }
 
-    let overWrite
-    if(deploySettings.overWrite === undefined){
-      overWrite = false
+    let skipIfAlreadyDeployed
+    if(deploySettings.skipIfAlreadyDeployed === undefined){
+      skipIfAlreadyDeployed = false
     }
     else{
-      overWrite = true
+      skipIfAlreadyDeployed = true
     }
-    if(overWrite && existsSync(`./deployments/${networkName}/${deploySettings.contractName}.json`)){
+    if(skipIfAlreadyDeployed && existsSync(`./deployments/${networkName}/${deploySettings.contractName}.json`)){
       cyan(`Using existing implementation for ${deploySettings.contractName}`)
       return
     }
