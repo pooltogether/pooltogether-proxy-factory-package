@@ -23,11 +23,23 @@ Pass the paramaters required:
 interface DeploySettings {
     implementationAddress: string
     contractName: string
-    overWrite?: boolean
-    signer?: any 
-    initializeData?: any
-    provider: any 
+    overWrite?: boolean // defaults to false
+    signer?: Signer
+    initializeData?: string 
+    provider: Provider 
 }
+```
+
+The initialization data can be encoded as such:
+```typescript
+const contractInterface = new ethers.utils.Interface(contractAbi)
+
+const constructorArgs: string = contractInterface.encodeFunctionData(contractInterface.getFunction("functionName"),
+    [
+        arg1,
+        arg2
+    ]
+)
 ```
 
 
