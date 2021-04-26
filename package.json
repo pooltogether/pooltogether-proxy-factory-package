@@ -1,8 +1,9 @@
 {
   "name": "@pooltogether/pooltogether-proxy-factory-package",
-  "version": "1.0.0-beta.17",
+  "version": "1.0.0-beta.18",
   "description": "Typescript package to use the GenericProxyFactory",
   "main": "dist/src/index.js",
+  "types": "dist/src/deploy.d.ts",
   "repository": "github.com:pooltogether/pooltogether-proxy-factory-package",
   "license": "MIT",
   "scripts": {
