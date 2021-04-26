@@ -21,7 +21,7 @@ export function getGenericProxyFactoryAddressForChainId(chainId: number) : any {
           return "0xd1797D46C3E825fce5215a0259D3426a5c49455C"
         case 80001:
           return "0xd1797D46C3E825fce5215a0259D3426a5c49455C"
-            
-          //throw new Error(`No GenericProxyFactory deployment file found for chainId ${chainId}`)
+        default:
+          return ""
     }
 };

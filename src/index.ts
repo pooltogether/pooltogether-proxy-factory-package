@@ -1,4 +1,4 @@
-import {factoryDeploy, DeploySettings } from "./deploy"
+import {factoryDeploy } from "./deploy"
 
 
 

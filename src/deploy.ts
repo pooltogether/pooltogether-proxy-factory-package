@@ -1,6 +1,6 @@
 // exports a generic factoryDeploy using the generic minimal proxy factories
 import chalk from 'chalk';
-import { existsSync, mkdirSync, writeFileSync } from 'fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 
 import GenericProxyFactory from "../abis/GenericProxyFactory.json"
 
@@ -45,16 +45,44 @@ interface ProxyDeployment {
     bytecode?: string
 }
 
-export interface DeploySettings {
+export interface FactoryDeploySettings {
     implementationAddress: string
     contractName: string
+    provider: providers.Provider 
     skipIfAlreadyDeployed?: boolean // defaults to false
     signer?: Signer // do we definitely need this? get from the provider?
     initializeData?: string
-    provider: providers.Provider 
 }
 
-export async function factoryDeploy(deploySettings: DeploySettings){
+interface Deployment {
+  abi?: any;
+  address: string;
+  receipt?: any;
+  transactionHash?: string;
+  // history?: Deployment[];
+  implementation?: string;
+  args?: any[];
+  // linkedData?: any;
+  // solcInputHash?: string;
+  // metadata?: string;
+  // bytecode?: string;
+  // deployedBytecode?: string;
+  // libraries?: Libraries;
+  // userdoc?: any;
+  // devdoc?: any;
+  // methodIdentifiers?: any;
+  // diamondCut?: FacetCut[];
+  // facets?: FacetCut[];
+  // storageLayout?: any;
+  // gasEstimates?: any;
+}
+
+export interface DeployResult extends Deployment {
+  newlyDeployed: boolean;
+}
+
+
+export async function factoryDeploy(deploySettings: FactoryDeploySettings): Promise<DeployResult>{
 
     const provider = deploySettings.provider
     let networkName = (await provider.getNetwork()).name
@@ -76,29 +104,36 @@ export async function factoryDeploy(deploySettings: DeploySettings){
     }
     if(skipIfAlreadyDeployed && existsSync(`./deployments/${networkName}/${deploySettings.contractName}.json`)){
       cyan(`Using existing implementation for ${deploySettings.contractName}`)
-      return
+      // contract already exists -- read info for return object
+      const previouslyDeployedContract = JSON.parse(await readFileSync(`./deployments/${networkName}/${deploySettings.contractName}.json`,{encoding:"utf-8"}))
+      return {
+        newlyDeployed: false,
+        address: previouslyDeployedContract.address,
+        transactionHash: previouslyDeployedContract.transactionHash,
+        receipt: previouslyDeployedContract.receipt,
+      }
     }
 
   
         // get address of minimal proxy factory
     const chainId = (await provider.getNetwork()).chainId
     
-    dim(`factoryDeploy for chainId ${chainId}`)
+    if(chainId === 31337 || chainId === 1337){ // network name "unknown" for the test networks
+      networkName = "localhost"
+    }
+    
+    let genericProxyFactoryAddress: string = getGenericProxyFactoryAddressForChainId(chainId)
 
-    let genericProxyFactoryAddress: string = ""
-    if(chainId === 31337 || chainId === 1337){  // if is localhost we will need to deploy a local proxy factory instance
-      dim(`Test network detected.. deploying GenericPorxyFactory`)
+    // if no generic proxy factory -- create one
+    if(genericProxyFactoryAddress == ""){  
+      dim(`No GenericProxyFactory deployment found. Deploying a new GenericProxyFactory`)
       const genericProxyFactoryInterface = new ethers.utils.Interface(GenericProxyFactory.abi)
       const genericProxyFactoryContractFactory = new ethers.ContractFactory(genericProxyFactoryInterface, GenericProxyFactory.bytecode, deploySettings.signer)
       const genericProxyFacoryContract = await genericProxyFactoryContractFactory.deploy()
       await genericProxyFacoryContract.deployTransaction.wait()
       genericProxyFactoryAddress = genericProxyFacoryContract.address
-
-      networkName = "localhost"
-
-    }
-    else{
-      genericProxyFactoryAddress = getGenericProxyFactoryAddressForChainId(chainId)
+      green(`Deployed GenericProxyFactory for ${networkName} at ${genericProxyFactoryAddress}`)
+      dim(`If this is not a test network, consider adding to the generic proxy factory repo constants`)
     }
 
   
@@ -110,7 +145,7 @@ export async function factoryDeploy(deploySettings: DeploySettings){
 
     // grab abi and connect to contract instance
     const genericProxyFactoryContract = new ethers.Contract(genericProxyFactoryAddress, GenericProxyFactory.abi, deploySettings.signer)
-    dim(`Creating Proxy...`)
+    dim(`Creating Proxy...implementationAddress: ${deploySettings.implementationAddress}, initializeData: ${initializeData}`)
     const createProxyResult = await genericProxyFactoryContract.create(deploySettings.implementationAddress, initializeData)
 
     dim(`Awaiting transaction confirmation...`)
@@ -121,18 +156,28 @@ export async function factoryDeploy(deploySettings: DeploySettings){
     const createdEvent = genericProxyFactoryContract.interface.parseLog(receipt.logs[0]);
     green(`Proxy for ${deploySettings.contractName} created at ${createdEvent.args.created}`)
 
+    const bytecode = await provider.getCode(createdEvent.args.created)
+
     const jsonObj: ProxyDeployment = {
         address: createdEvent.args.created,
         transactionHash: receipt.transactionHash,
         receipt: receipt,
         args: deploySettings?.initializeData,
-        bytecode: `${await provider.getCode(createdEvent.args.created)}`
+        bytecode: bytecode
     }
     const pathFileBase = `./deployments/${networkName}`
     const pathFile = `${pathFileBase}/${deploySettings.contractName}.json`
 
     mkdirSync(pathFileBase, { recursive: true });
 
-    writeFileSync(pathFile, JSON.stringify(jsonObj), {encoding:'utf8',flag:'w'})
+    writeFileSync(pathFile, JSON.stringify(jsonObj, null, 3), {encoding:'utf8',flag:'w'})
     dim(`Deployments file saved at ${pathFile}`)
+
+    return {
+      newlyDeployed: true,
+      address: createdEvent.args.created,
+      transactionHash: createProxyResult.hash,
+      receipt: receipt,
+    }
+  
 }
