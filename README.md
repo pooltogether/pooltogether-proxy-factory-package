@@ -1,6 +1,6 @@
 # pooltogether-proxy-factory-package
 
-Typescript wrapper to use PoolTogether's Generic Minimal Proxy Factory for deploying contracts.
+Typescript wrapper to use PoolTogether's ([Generic Minimal Proxy Factory](https://github.com/pooltogether/pooltogether-proxy-factory/tree/master/deployments)) for deploying contracts.
 
 ## How it works
 
@@ -78,10 +78,3 @@ Run the unit tests locally with:
 ## Coverage
 Generate the test coverage report with:
 `yarn coverage`
-
-Todo:
-- use peerDependency for pooltgoether-proxy-factory
-- Write script that extracts deployed generic proxy factory addresses automatically
-- update tpes for DeploySettings interface
-- do we need both the signer and the provider
-- prublish non beta version
