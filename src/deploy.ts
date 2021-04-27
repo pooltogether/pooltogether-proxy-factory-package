@@ -146,6 +146,7 @@ export async function factoryDeploy(deploySettings: FactoryDeploySettings): Prom
     // grab abi and connect to contract instance
     const genericProxyFactoryContract = new ethers.Contract(genericProxyFactoryAddress, GenericProxyFactory.abi, deploySettings.signer)
     dim(`Creating Proxy...implementationAddress: ${deploySettings.implementationAddress}, initializeData: ${initializeData}`)
+    
     const createProxyResult = await genericProxyFactoryContract.create(deploySettings.implementationAddress, initializeData)
 
     dim(`Awaiting transaction confirmation...`)
@@ -170,7 +171,7 @@ export async function factoryDeploy(deploySettings: FactoryDeploySettings): Prom
 
     mkdirSync(pathFileBase, { recursive: true });
 
-    writeFileSync(pathFile, JSON.stringify(jsonObj, null, 3), {encoding:'utf8',flag:'w'})
+    writeFileSync(pathFile, JSON.stringify(jsonObj, null, 2), {encoding:'utf8',flag:'w'})
     dim(`Deployments file saved at ${pathFile}`)
 
     return {

@@ -12,7 +12,7 @@ Import in the deployments script:
 ```typescript
 import { factoryDeploy } from "@pooltogether/pooltogether-proxy-factory-package"
 ```
-or
+or using javascript: 
 ```javascript
 const { factoryDeploy } = require("@pooltogether/pooltogether-proxy-factory-package")
 ```
@@ -24,14 +24,13 @@ Add the genericProxyFactory deployment ([addresses](https://github.com/pooltoget
 namedAccounts: {
     ...
     genericProxyFactory: {
-        1: "0x14e09c3319244a84e7c1E7B52634f5220FA96623"
+        1: "0x14e09c3319244a84e7c1E7B52634f5220FA96623",
         4: "0x594069c560D260F90C21Be25fD2C8684efbb5628",
         42: "0x713edC7728C4F0BCc135D48fF96282444d77E604",
         137: "0xd1797D46C3E825fce5215a0259D3426a5c49455C",
         80001: "0xd1797D46C3E825fce5215a0259D3426a5c49455C"
     }
 ```
-
 
 Pass the paramaters required:
 ```typescript
@@ -57,12 +56,20 @@ const constructorArgs: string = contractInterface.encodeFunctionData(contractInt
 )
 ```
 
+*Note:* if there is no Generic Proxy Factory for the target network, one will be deployed
 
 
 # Installation
 Install the repo and dependencies by running:
 `yarn`
 
+# Build
+To build the package, run:
+`yarn dev`
+
+# Publish
+To publish any changes to npm, build first and then run:
+`yarn publish`
 
 # Testing
 Run the unit tests locally with:
