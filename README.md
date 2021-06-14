@@ -1,6 +1,8 @@
 # pooltogether-proxy-factory-package
 
-Typescript wrapper to use PoolTogether's ([Generic Minimal Proxy Factory](https://github.com/pooltogether/pooltogether-proxy-factory/tree/master/deployments)) for deploying contracts.
+Typescript wrapper to use PoolTogether's [Generic Minimal Proxy Factory](https://github.com/pooltogether/pooltogether-proxy-factory/tree/master/deployments) for deploying contracts.
+
+Note: this pattern does not work very well with Ownable contracts - because these must be constructed vs. initialized.
 
 ## How it works
 
